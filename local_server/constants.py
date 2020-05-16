@@ -7,8 +7,8 @@ import logging
 CONFIG_PATH = "configuration.yml"
 ALT_CONFIG_PATHS = [
     "config.yml",
-    "config.json",
-    "configuration.json"
+    "conf.yml",
+    "settings.yml"
 ]
 DEFAULT_CONFIG = {
     "domain": "localhost"
