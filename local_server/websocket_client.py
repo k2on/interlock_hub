@@ -1,5 +1,5 @@
 import time
-
+from .constants import errors
 from socketio import Client
 from socketio.exceptions import ConnectionError
 from .logger import logger
@@ -17,6 +17,7 @@ class WebSocketClient:
         self.local_server = ls
         self.client = Client()
         self.url = url
+        self.retry_connection = True
 
         @self.client.event
         def connect():
@@ -26,7 +27,8 @@ class WebSocketClient:
         @self.client.event
         def connect_error(*args):
             # Run the handle connection error method
-            self.handle_connection_error((args or ["UNKNOWN"])[0])
+            reason = (args or ["UNKNOWN"])[0]
+            self.handle_connection_error(reason)
 
         @self.client.event
         def disconnect():
@@ -47,6 +49,14 @@ class WebSocketClient:
         :return: None
         """
         logger.error("COULD NOT ESTABLISH WS CONNECTION, REASON: " + reason)
+
+        if reason == errors.INVALID_TOKEN:
+            # self.local_server.authenticator.reauthenticate()
+            self.disconnect(retry_after=lambda: None)
+        elif reason == errors.CONNECTION_REFUSED:
+            self.disconnect(retry_after=self.local_server.tester.establish_internet_tests)
+        else:
+            self.disconnect()
         return False
 
     def handle_disconnect(self):
@@ -57,9 +67,25 @@ class WebSocketClient:
         :return: None
         """
         logger.error("DISCONNECTED FROM THE WS SERVER")
+        self.disconnect()
+
+    def disconnect(self, retry_after=None):
+        logger.debug("DISCONNECTING CLIENT")
         self.client.disconnect()
-        logger.error("STOPPING THE PROGRAM")
-        self.local_server.stop()
+        logger.debug("CLIENT DISCONNECTED")
+        if retry_after is None:
+            self.retry_connection = False
+            logger.error("STOPPING THE PROGRAM")
+            return self.local_server.stop()
+
+        if not callable(retry_after):
+            raise TypeError("retry_after MUST be a function")
+
+        retry_after()
+
+        logger.info("RETRYING IN 10 SECONDS")
+        time.sleep(10)
+        return self.establish_connection()
 
     def connect(self):
         """
@@ -80,11 +106,12 @@ class WebSocketClient:
         Will force a connection to the websocket server
         :return: None
         """
-        while True:
+        while self.retry_connection:
             ok = self.connect()
             if ok:
                 break
-            logger.debug("RETRYING IN 5 SECONDS")
-            time.sleep(5)
+            if self.retry_connection:
+                logger.debug("RETRYING IN 5 SECONDS")
+                time.sleep(5)
 
 

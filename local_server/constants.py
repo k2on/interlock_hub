@@ -50,3 +50,8 @@ INET_TEST_URI = "https://www.google.com"  # url to test for internet
 # Logger constants
 
 LOGGER_FORMAT = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+
+
+class errors:
+    CONNECTION_REFUSED = "Connection refused by the server"
+    INVALID_TOKEN = "INVALID_TOKEN"
