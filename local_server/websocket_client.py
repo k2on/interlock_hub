@@ -1,5 +1,5 @@
 import time
-from .constants import errors
+from .constants import errors, codes
 from socketio import Client
 from socketio.exceptions import ConnectionError
 from .logger import logger
@@ -35,12 +35,16 @@ class WebSocketClient:
             # Handle disconnection
             self.handle_disconnect()
 
+    def set_status(self, code):
+        return self.local_server.set_status(code)
+
     def handle_connection(self):
         """
         Handles a successful connection to the websocket
         :return:
         """
         logger.info("CONNECTION ESTABLISHED")
+        self.set_status(codes.OK)
 
     def handle_connection_error(self, reason):
         """
@@ -51,11 +55,12 @@ class WebSocketClient:
         logger.error("COULD NOT ESTABLISH WS CONNECTION, REASON: " + reason)
 
         if reason == errors.INVALID_TOKEN:
-            # self.local_server.authenticator.reauthenticate()
-            self.disconnect(retry_after=lambda: None)
+            self.set_status(codes.INVALID_TOKEN_REAUTH)
+            self.disconnect(retry_after=self.local_server.authenticator.reauthenticate)
         elif reason == errors.CONNECTION_REFUSED:
             self.disconnect(retry_after=self.local_server.tester.establish_internet_tests)
         else:
+            self.set_status(codes.WS_CONNECTION_FAILED)
             self.disconnect()
         return False
 
@@ -67,24 +72,28 @@ class WebSocketClient:
         :return: None
         """
         logger.error("DISCONNECTED FROM THE WS SERVER")
-        self.disconnect()
 
-    def disconnect(self, retry_after=None):
+        self.disconnect(retry=True)
+
+    def disconnect(self, retry=False, retry_after=None):
         logger.debug("DISCONNECTING CLIENT")
         self.client.disconnect()
         logger.debug("CLIENT DISCONNECTED")
-        if retry_after is None:
+        if not retry and not callable(retry_after):
             self.retry_connection = False
             logger.error("STOPPING THE PROGRAM")
             return self.local_server.stop()
 
-        if not callable(retry_after):
-            raise TypeError("retry_after MUST be a function")
+        if callable(retry_after):
+            retry_after()
 
-        retry_after()
+        print(retry_after)
+        print(retry_after)
 
         logger.info("RETRYING IN 10 SECONDS")
         time.sleep(10)
+
+
         return self.establish_connection()
 
     def connect(self):
@@ -96,7 +105,8 @@ class WebSocketClient:
         """
         logger.info("ESTABLISHING WEBSOCKET CONNECTION")
         try:
-            self.client.connect(self.url)
+            url = f"{self.url}?token=" + self.local_server.authenticator.token
+            self.client.connect(url)
             return True
         except ConnectionError as e:
             self.handle_connection_error((e.args or ["UNKNOWN"])[0])
@@ -106,6 +116,7 @@ class WebSocketClient:
         Will force a connection to the websocket server
         :return: None
         """
+        self.set_status(codes.ESTABLISHING_WS)
         while self.retry_connection:
             ok = self.connect()
             if ok:

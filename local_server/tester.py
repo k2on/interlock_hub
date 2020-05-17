@@ -1,5 +1,5 @@
 from requests import get, ConnectionError
-from .constants import INET_TEST_URI, WEB_BASE_URL
+from .constants import INET_TEST_URI, WEB_BASE_URL, codes
 from .exceptions import NoInternetConnection, NoServerConnection
 from .logger import logger
 
@@ -11,8 +11,8 @@ class Tester:
     Tests the system's capabilities
         Will not allow the system to run without critical systems to be operational
     """
-    def __init__(self):
-        pass
+    def __init__(self, local_server):
+        self.local_server = local_server
 
     @staticmethod
     def establish_network_connection(func):
@@ -47,6 +47,9 @@ class Tester:
             cls.establish_network_connection(func)
         return True
 
+    def set_status(self, code):
+        return self.local_server.set_status(code)
+
     def establish_successful_tests(self):
         """
         Runs the system's tests
@@ -56,11 +59,13 @@ class Tester:
         """
         # TODO: when adding this to ras pi, add tests for lights or screens or whatever
         logger.info("ESTABLISHING SYSTEM TESTS")
+        self.set_status(codes.RUNNING_TESTS)
         self.establish_internet_tests()
+        self.set_status(codes.TESTS_SUCCESS)
         logger.info("ALL TESTS SUCCEEDED")
         return True
 
-    def test_network_connection(self, url, connection_type):
+    def test_network_connection(self, url, connection_type, error_code):
         """
         Will test the connection to a given URL
 
@@ -76,6 +81,7 @@ class Tester:
                 return True
             except ConnectionError:
                 logger.error(f"NO {connection_type} CONNECTION")
+                self.set_status(error_code)
                 return False
         return func
 
@@ -86,9 +92,11 @@ class Tester:
         :return: boolean, should only be True
         """
         logger.info("ESTABLISHING INTERNET TESTS")
-        self.establish_network_connections(self.test_network_connection(INET_TEST_URI, "INTERNET"),
-                                           self.test_network_connection(WEB_BASE_URL, "SERVER"))
+        self.set_status(codes.RUNNING_INET_TEST)
+        self.establish_network_connections(self.test_network_connection(INET_TEST_URI, "INTERNET", codes.NO_INTERNET),
+                                           self.test_network_connection(WEB_BASE_URL, "SERVER", codes.NO_SERVER))
         logger.info("ALL INTERNET TESTS SUCCEEDED")
+        self.set_status(codes.INET_TEST_SUCCESS)
         return True
 
 

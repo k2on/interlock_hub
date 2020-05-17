@@ -12,5 +12,6 @@ class RequestFailed(Exception):
     """
     HTTP request that failed
     """
-    def __init__(self):
+    def __init__(self, resp):
         super().__init__("REQUEST_FAILED")
+        self.resp = resp

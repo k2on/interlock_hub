@@ -1,9 +1,9 @@
 from .authenticator import Authenticator
 from .websocket_client import WebSocketClient
-from .constants import API_URL, WEB_BASE_URL, WS_BASE_URL
+from .constants import API_URL, WEB_BASE_URL, WS_BASE_URL, START_SPLASH_TEXT, END_SPLASH_TEXT, codes
 from .exceptions import NoInternetConnection, NoServerConnection
 from .tester import Tester
-
+from .web_server import WebServer
 from .logger import logger
 
 
@@ -12,12 +12,19 @@ class LocalServer:
     Main class for the local server
     """
     def __init__(self):
+        self.status_code = codes.INTERNAL_SETUP
         # WebSocket client
         self.ws_client = WebSocketClient(self, WS_BASE_URL)
+        # WebServer
+        self.web_server = WebServer(self)
         # User authentication
-        self.authenticator = Authenticator()
+        self.authenticator = Authenticator(self)
         # Runs tests for the system
-        self.tester = Tester()
+        self.tester = Tester(self)
+
+    @property
+    def status_code_name(self):
+        return codes.to_name(self.status_code)
 
     def run(self):
         """
@@ -28,7 +35,16 @@ class LocalServer:
 
         :return: Nothing
         """
+        print(START_SPLASH_TEXT)
         logger.info("Starting Local Server")
+
+        # Start the Web Server
+        try:
+            self.set_status(codes.WEBSERVER_SETUP)
+            self.web_server.start()
+        except:
+            logger.error("COULD NOT START THE WEBSERVER")
+            self.set_status(codes.WEBSERVER_SETUP_ERROR)
 
         # tests system
         self.tester.establish_successful_tests()
@@ -47,6 +63,10 @@ class LocalServer:
         :return: None
         """
         logger.info("SHUTTING DOWN...")
+        self.web_server.stop()
         logger.debug("good bye <3")
+        print(END_SPLASH_TEXT)
         # exit(code)
 
+    def set_status(self, code):
+        self.status_code = code

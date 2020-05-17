@@ -1,2 +1,6 @@
 # Config for the Interlock Local Server
 domain: localhost
+machine_id: TESTER
+confirmation_code: ADCDEF
+machine_secret: 2435996091b70738fa942ccfa8e0be6344bf7b24f717fcf6fc7d9c965abd08e7
+local_server_port: 81
