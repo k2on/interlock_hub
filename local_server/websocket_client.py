@@ -3,6 +3,7 @@ from .constants import errors, codes
 from socketio import Client
 from socketio.exceptions import ConnectionError
 from .logger import logger
+from .request_handler import RequestHandler
 
 
 class WebSocketClient:
@@ -18,6 +19,7 @@ class WebSocketClient:
         self.client = Client()
         self.url = url
         self.retry_connection = True
+        self.request_handler = RequestHandler(self.local_server)
 
         @self.client.event
         def connect():
@@ -34,6 +36,13 @@ class WebSocketClient:
         def disconnect():
             # Handle disconnection
             self.handle_disconnect()
+
+        @self.client.on('request')
+        def request(*args):
+            if len(args) == 0:
+                logger.error("GOT EMPTY REQUEST")
+                return
+            self.request_handler.handle(args[0])
 
     def set_status(self, code):
         return self.local_server.set_status(code)
@@ -87,12 +96,8 @@ class WebSocketClient:
         if callable(retry_after):
             retry_after()
 
-        print(retry_after)
-        print(retry_after)
-
-        logger.info("RETRYING IN 10 SECONDS")
+        logger.info("ESTABLISHING CONNECTION IN 10 SECONDS")
         time.sleep(10)
-
 
         return self.establish_connection()
 

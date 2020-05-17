@@ -1,7 +1,6 @@
 from .authenticator import Authenticator
 from .websocket_client import WebSocketClient
 from .constants import API_URL, WEB_BASE_URL, WS_BASE_URL, START_SPLASH_TEXT, END_SPLASH_TEXT, codes
-from .exceptions import NoInternetConnection, NoServerConnection
 from .tester import Tester
 from .web_server import WebServer
 from .logger import logger
@@ -69,4 +68,9 @@ class LocalServer:
         # exit(code)
 
     def set_status(self, code):
+        """
+        Sets the internal status code
+        :param code: int of the status code
+        :return: None
+        """
         self.status_code = code
