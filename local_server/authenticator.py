@@ -3,7 +3,14 @@ import time
 import requests
 import platform
 from .exceptions import RequestFailed
-from .constants import MACHINE_ID, MACHINE_SECRET, LOCAL_SERVERS_URL, HUB_VERSION, USER_TOKEN_PATH, codes
+from .constants import (
+    MACHINE_ID,
+    MACHINE_SECRET,
+    LOCAL_SERVERS_URL,
+    HUB_VERSION,
+    USER_TOKEN_PATH,
+    codes,
+)
 from os import path
 
 
@@ -11,6 +18,7 @@ class Authenticator:
     """
     Class for Authenticating the Local Server with a User
     """
+
     def __init__(self, local_server):
         self.local_server = local_server
         self.token = self.get_saved_token()
@@ -82,19 +90,22 @@ class Authenticator:
         try:
             url = f"{LOCAL_SERVERS_URL}{MACHINE_ID}"
             machine_data = platform.uname()
-            response = requests.get(url, params={
-                'os': machine_data.system,
-                'machine_name': machine_data.node,
-                'os_version': machine_data.version,
-                'hub_version': HUB_VERSION,
-                'secret': MACHINE_SECRET,
-            })
+            response = requests.get(
+                url,
+                params={
+                    "os": machine_data.system,
+                    "machine_name": machine_data.node,
+                    "os_version": machine_data.version,
+                    "hub_version": HUB_VERSION,
+                    "secret": MACHINE_SECRET,
+                },
+            )
             # TODO: add error handling
 
             if not response.ok:
                 raise RequestFailed(response)
 
-            return response.json().get('user_token')
+            return response.json().get("user_token")
 
         except requests.ConnectionError:
             logger.error("USER LINK REQUEST FAILED, TESTING INTERNET CONNECTION")
@@ -108,4 +119,3 @@ class Authenticator:
             logger.fatal("USER LINK REQUEST FAILED, REASON: " + str(reason))
             self.set_status(codes.GET_TOKEN_REQ_FAILED)
             exit()
-

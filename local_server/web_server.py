@@ -6,11 +6,10 @@ from flask import Flask
 
 
 class WebServer:
-
     class ServerThread(threading.Thread):
         def __init__(self, app):
             threading.Thread.__init__(self)
-            self.srv = make_server('0.0.0.0', LOCAL_SERVER_PORT, app)
+            self.srv = make_server("0.0.0.0", LOCAL_SERVER_PORT, app)
             self.ctx = app.app_context()
             self.ctx.push()
 
@@ -24,18 +23,29 @@ class WebServer:
         self.local_server = local_server
         self.app = Flask(__name__)
 
-        @self.app.route('/')
+        @self.app.route("/")
         def index():
-            return str(self.local_server.status_code) + " : " + self.local_server.status_code_name
+            return (
+                str(self.local_server.status_code)
+                + " : "
+                + self.local_server.status_code_name
+            )
 
         self.server = self.ServerThread(self.app)
 
     def start(self):
+        """
+        Starts the webserver
+        :return: None
+        """
         logger.debug("STARTING WEBSERVER")
         self.server.start()
 
     def stop(self):
+        """
+        Stops the webserver
+        :return: None
+        """
         logger.info("SHUTTING DOWN THE WEBSERVER...")
         self.server.stop()
         logger.info("SHUT DOWN THE WEBSERVER")
-

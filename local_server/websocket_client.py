@@ -14,6 +14,7 @@ class WebSocketClient:
     Handles errors and stuff
 
     """
+
     def __init__(self, ls, url):
         self.local_server = ls
         self.client = Client()
@@ -37,7 +38,7 @@ class WebSocketClient:
             # Handle disconnection
             self.handle_disconnect()
 
-        @self.client.on('request')
+        @self.client.on("request")
         def request(*args):
             if len(args) == 0:
                 logger.error("GOT EMPTY REQUEST")
@@ -67,7 +68,9 @@ class WebSocketClient:
             self.set_status(codes.INVALID_TOKEN_REAUTH)
             self.disconnect(retry_after=self.local_server.authenticator.reauthenticate)
         elif reason == errors.CONNECTION_REFUSED:
-            self.disconnect(retry_after=self.local_server.tester.establish_internet_tests)
+            self.disconnect(
+                retry_after=self.local_server.tester.establish_internet_tests
+            )
         else:
             self.set_status(codes.WS_CONNECTION_FAILED)
             self.disconnect()
@@ -129,5 +132,3 @@ class WebSocketClient:
             if self.retry_connection:
                 logger.debug("RETRYING IN 5 SECONDS")
                 time.sleep(5)
-
-

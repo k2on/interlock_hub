@@ -8,6 +8,11 @@ class RequestHandler:
         self.ws_client = self.local_server.ws_client
 
     def handle(self, data):
+        """
+        Handle a request
+        :param data: dict
+        :return: result of the request
+        """
         try:
             return self.handle_request(data)
         except HandlerError as e:
@@ -15,11 +20,7 @@ class RequestHandler:
 
     def handle_request(self, data):
 
-        handler_map = {
-            "MSG": self.handle_message,
-            "CMD": None,
-            "GET": None
-        }
+        handler_map = {"MSG": self.handle_message, "CMD": None, "GET": None}
 
         request_type: str = data.get("t")
         if not request_type:
@@ -45,4 +46,3 @@ class RequestHandler:
 
         if message_type == "DEBUG":
             logger.debug(message)
-

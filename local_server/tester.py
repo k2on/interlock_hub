@@ -11,6 +11,7 @@ class Tester:
     Tests the system's capabilities
         Will not allow the system to run without critical systems to be operational
     """
+
     def __init__(self, local_server):
         self.local_server = local_server
 
@@ -73,6 +74,7 @@ class Tester:
         :param connection_type: str: used for debug
         :return: boolean, status of the connection
         """
+
         def func():
             logger.debug(f"TESTING {connection_type} CONNECTION")
             try:
@@ -83,6 +85,7 @@ class Tester:
                 logger.error(f"NO {connection_type} CONNECTION")
                 self.set_status(error_code)
                 return False
+
         return func
 
     def establish_internet_tests(self):
@@ -93,11 +96,10 @@ class Tester:
         """
         logger.info("ESTABLISHING INTERNET TESTS")
         self.set_status(codes.RUNNING_INET_TEST)
-        self.establish_network_connections(self.test_network_connection(INET_TEST_URI, "INTERNET", codes.NO_INTERNET),
-                                           self.test_network_connection(WEB_BASE_URL, "SERVER", codes.NO_SERVER))
+        self.establish_network_connections(
+            self.test_network_connection(INET_TEST_URI, "INTERNET", codes.NO_INTERNET),
+            self.test_network_connection(WEB_BASE_URL, "SERVER", codes.NO_SERVER),
+        )
         logger.info("ALL INTERNET TESTS SUCCEEDED")
         self.set_status(codes.INET_TEST_SUCCESS)
         return True
-
-
-

@@ -4,22 +4,18 @@ from os import path
 import logging
 
 # Versions
-HUB_VERSION = '1.0'
+HUB_VERSION = "1.0"
 
 # Files
 CONFIG_PATH = "configuration.yml"
 USER_TOKEN_PATH = ".user_token"
 
-ALT_CONFIG_PATHS = [
-    "config.yml",
-    "conf.yml",
-    "settings.yml"
-]
+ALT_CONFIG_PATHS = ["config.yml", "conf.yml", "settings.yml"]
 DEFAULT_CONFIG = {
     "domain": "localhost",
     "machine_id": "WwvsckaAQQLG3Kf3ms41Z0ZJw",
     "confirmation_code": "N38SM4",
-    "local_server_port": 80
+    "local_server_port": 80,
 }
 
 if not path.exists(CONFIG_PATH):
@@ -42,7 +38,11 @@ except Exception as e:
 
 DOMAIN = config.get("domain", DEFAULT_CONFIG.get("domain"))
 MACHINE_ID = config.get("machine_id", DEFAULT_CONFIG.get("machine_id"))
-CONFIRMATION_CODE = config.get("confirmation_code", DEFAULT_CONFIG.get("confirmation_code")).upper().strip()
+CONFIRMATION_CODE = (
+    config.get("confirmation_code", DEFAULT_CONFIG.get("confirmation_code"))
+    .upper()
+    .strip()
+)
 if not CONFIRMATION_CODE.isalnum():
     raise ValueError("confirmation code must be alphanumeric")
 if len(CONFIRMATION_CODE) != 6:
@@ -57,7 +57,9 @@ if CONFIRMATION_CODE == DEFAULT_CONFIG.get("confirmation_code"):
 if not MACHINE_SECRET:
     raise ValueError("THE MACHINE SECRET MUST BE SET")
 
-LOCAL_SERVER_PORT = config.get("local_server_port", DEFAULT_CONFIG.get("local_server_port"))
+LOCAL_SERVER_PORT = config.get(
+    "local_server_port", DEFAULT_CONFIG.get("local_server_port")
+)
 
 # Internet Constants
 
@@ -85,51 +87,52 @@ class errors:
     CONNECTION_REFUSED = "Connection refused by the server"
     INVALID_TOKEN = "INVALID_TOKEN"
 
+
 class codes:
 
     # set up
 
-    INTERNAL_SETUP        = 1
-    SERVICE_SETUP         = 11
-    WEBSERVER_SETUP       = 111
+    INTERNAL_SETUP = 1
+    SERVICE_SETUP = 11
+    WEBSERVER_SETUP = 111
 
-    RUNNING_TESTS         = 12
-    RUNNING_INET_TESTS    = 121
-    RUNNING_INET_TEST     = 1211
-    RUNNING_SERVER_TEST   = 1212
+    RUNNING_TESTS = 12
+    RUNNING_INET_TESTS = 121
+    RUNNING_INET_TEST = 1211
+    RUNNING_SERVER_TEST = 1212
 
-    AUTHORIZING           = 13
-    NEEDS_USER_AUTH       = 131
+    AUTHORIZING = 13
+    NEEDS_USER_AUTH = 131
 
-    ESTABLISHING_WS       = 14
+    ESTABLISHING_WS = 14
 
     # success
 
-    OK                    = 2
-    TESTS_SUCCESS         = 22
-    INET_TEST_SUCCESS     = 221
+    OK = 2
+    TESTS_SUCCESS = 22
+    INET_TEST_SUCCESS = 221
 
-    AUTHORIZED            = 23
+    AUTHORIZED = 23
 
     # 3 class is like a warning
 
-    REAUTHENTICATING      = 33
-    INVALID_TOKEN_REAUTH  = 331
+    REAUTHENTICATING = 33
+    INVALID_TOKEN_REAUTH = 331
 
     # errors
 
-    SERVICE_ERROR         = 41
+    SERVICE_ERROR = 41
     WEBSERVER_SETUP_ERROR = 411
 
-    TEST_ERROR            = 42
-    INET_TEST_ERROR       = 421
-    NO_INTERNET           = 4211
-    NO_SERVER             = 4212
+    TEST_ERROR = 42
+    INET_TEST_ERROR = 421
+    NO_INTERNET = 4211
+    NO_SERVER = 4212
 
-    AUTH_FAILED           = 43
-    GET_TOKEN_REQ_FAILED  = 431
+    AUTH_FAILED = 43
+    GET_TOKEN_REQ_FAILED = 431
 
-    WS_CONNECTION_FAILED  = 44
+    WS_CONNECTION_FAILED = 44
 
     @classmethod
     def to_name(cls, code):
@@ -138,9 +141,10 @@ class codes:
                 return key
         return "UNKNOWN"
 
+
 # Non important but nice things
 
-START_SPLASH_TEXT = '''
+START_SPLASH_TEXT = """
     _____   __________________  __    ____  ________ __
    /  _/ | / /_  __/ ____/ __ \/ /   / __ \/ ____/ //_/
    / //  |/ / / / / __/ / /_/ / /   / / / / /   / ,<   
@@ -148,13 +152,13 @@ START_SPLASH_TEXT = '''
 /___/_/ |_/ /_/ /_____/_/ |_/_____/\____/\____/_/ |_|  
 
                 created by Max Koon, 2020
-'''
+"""
 
-END_SPLASH_TEXT = '''
+END_SPLASH_TEXT = """
                           __   __             
    ____ _____  ____  ____/ /  / /_  __  _____ 
   / __ `/ __ \/ __ \/ __  /  / __ \/ / / / _ \\
  / /_/ / /_/ / /_/ / /_/ /  / /_/ / /_/ /  __/
  \__, /\____/\____/\__,_/  /_.___/\__, /\___/ 
 /____/                           /____/       
-'''
+"""

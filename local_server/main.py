@@ -1,6 +1,13 @@
 from .authenticator import Authenticator
 from .websocket_client import WebSocketClient
-from .constants import API_URL, WEB_BASE_URL, WS_BASE_URL, START_SPLASH_TEXT, END_SPLASH_TEXT, codes
+from .constants import (
+    API_URL,
+    WEB_BASE_URL,
+    WS_BASE_URL,
+    START_SPLASH_TEXT,
+    END_SPLASH_TEXT,
+    codes,
+)
 from .tester import Tester
 from .web_server import WebServer
 from .logger import logger
@@ -10,6 +17,7 @@ class LocalServer:
     """
     Main class for the local server
     """
+
     def __init__(self):
         self.status_code = codes.INTERNAL_SETUP
         # WebSocket client

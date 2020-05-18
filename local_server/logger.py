@@ -2,7 +2,7 @@ import logging
 from .constants import LOGGER_FORMAT
 
 
-logger = logging.getLogger('Local Server')
+logger = logging.getLogger("Local Server")
 logger.setLevel(logging.DEBUG)
 
 _ch = logging.StreamHandler()
