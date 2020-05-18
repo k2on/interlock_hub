@@ -15,7 +15,7 @@ DEFAULT_CONFIG = {
     "domain": "localhost",
     "machine_id": "WwvsckaAQQLG3Kf3ms41Z0ZJw",
     "confirmation_code": "N38SM4",
-    "local_server_port": 80,
+    "local_server_port": 8080,
 }
 
 if not path.exists(CONFIG_PATH):
