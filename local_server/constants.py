@@ -26,7 +26,7 @@ if not path.exists(CONFIG_PATH):
 
 try:
     with open(CONFIG_PATH) as f:
-        config = yaml.load(f, Loader=yaml.FullLoader)
+        config = yaml.load(f)
         f.close()
 except FileNotFoundError:
     logging.error("NO CONFIG FILE FOUND")

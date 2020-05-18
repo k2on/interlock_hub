@@ -5,7 +5,10 @@ from .logger import logger
 class RequestHandler:
     def __init__(self, local_server):
         self.local_server = local_server
-        self.ws_client = self.local_server.ws_client
+
+    @property
+    def ws_client(self):
+        return self.local_server.ws_client
 
     def handle(self, data):
         """
