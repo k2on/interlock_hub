@@ -6,4 +6,5 @@ class LocalServerMock(LocalServer):
         """
         Mock Local Server
         """
+        self._is_from_test = True
         super().__init__()

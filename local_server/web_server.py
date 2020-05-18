@@ -7,9 +7,13 @@ from flask import Flask
 
 class WebServer:
     class ServerThread(threading.Thread):
-        def __init__(self, app):
+        def __init__(self, app, is_from_test=False):
             threading.Thread.__init__(self)
-            self.srv = make_server("0.0.0.0", LOCAL_SERVER_PORT, app)
+            try:
+                self.srv = make_server("0.0.0.0", LOCAL_SERVER_PORT, app)
+            except OSError as e:
+                if not is_from_test:
+                    raise e
             self.ctx = app.app_context()
             self.ctx.push()
 
@@ -31,7 +35,7 @@ class WebServer:
                 + self.local_server.status_code_name
             )
 
-        self.server = self.ServerThread(self.app)
+        self.server = self.ServerThread(self.app, self.local_server._is_from_test)
 
     def start(self):
         """

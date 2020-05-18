@@ -20,6 +20,8 @@ class LocalServer:
 
     def __init__(self):
         self.status_code = codes.INTERNAL_SETUP
+        if "_is_from_test" not in self.__dict__:
+            self._is_from_test = False
         # WebSocket client
         self.ws_client = WebSocketClient(self, WS_BASE_URL)
         # WebServer
@@ -28,6 +30,7 @@ class LocalServer:
         self.authenticator = Authenticator(self)
         # Runs tests for the system
         self.tester = Tester(self)
+        # for testing, do not touch
 
     @property
     def status_code_name(self):
